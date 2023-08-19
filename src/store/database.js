@@ -5,14 +5,22 @@ import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
 
 export async function init(initialState) {
-    const currentDir = dirname(fileURLToPath(import.meta.url));
-    const filePath = join(currentDir, "./_data/db.json");
+    const filePath = getPath();
     const adapter = new JSONFile(filePath);
     const db = new Low(adapter, initialState);
-    
+
     if (!(await db.read())) {
-        db.write()
+        db.write();
     }
 
     return db;
+}
+
+function getPath() {
+    if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+        return join(dirname(__dirname), "./db.json");
+    } else {
+        const currentDir = dirname(fileURLToPath(import.meta.url));
+        return join(currentDir, "./data/db.json");
+    }
 }
